@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Practical, hardware-grounded architectural design principles, Mixture-of-Experts (MoE) co-design patterns, low-precision numerics rules, and distributed systems mappings for training and serving foundation models on Google Cloud TPUs (Ironwood / TPU v7x and future TPU generations).
+Google designed TPUs from the ground up for machine learning efficiency and performance per total cost of ownership (TCO), trading general-purpose hardware scheduling for wide systolic arrays, dedicated SparseCore engines, and custom interconnect fabrics. This living guide provides practical, hardware-grounded architectural design principles, Mixture-of-Experts (MoE) co-design patterns, low-precision numerics rules, and distributed systems mappings for training and serving LLMs, MoEs, and other hardware-intensive workloads on Google Cloud TPUs (Ironwood / TPU v7x and future TPU generations).
 
 * **Online Book & Blog:** <https://ai-hypercomputer.github.io/tpu-codesign/>
 * **Single-Page Guide:** [`docs/guide.md`](docs/guide.md)
