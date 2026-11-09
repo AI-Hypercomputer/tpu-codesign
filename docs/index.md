@@ -14,7 +14,7 @@ Performance tuning starts with model definition. Architectural choices made befo
 
 1. **[Shape rules](shape-rules.md) (Principles 1–3):** Hardware-aligned dimensions, single-plan parallelism, and static shapes with dynamic runtime extent; near-zero model-quality risk. *Adopt always.*
 2. **[Architecture choices](architecture-choices.md) (Principles 4–9):** Structural and numerical design choices; most involve quality trade-offs. *Validate with ablations.*
-3. **[Expressing parallelism & systems mapping](systems-mapping.md) (Principles 10–13):** Parallelism placement across physical links, memory pipelining, serving disaggregation, and compiler tuning; no model checkpoint changes required.
+3. **[Expressing parallelism & systems mapping](systems-mapping.md) (Principles 10–13):** Parallelism placement across physical links, memory pipelining, serving disaggregation, and compiler tuning; no model architecture changes required.
 
 **How to use this guide.** The shape rules apply to anyone designing a new model; use the summary table below to filter the rest, with the *Targets* column routing training versus inference owners and the *Scope* column marking the MoE-specific rules. If you are adapting an existing checkpoint rather than designing a new architecture, jump directly to [Systems mapping](systems-mapping.md) and [Blueprint & Diagnostics](blueprint-and-diagnostics.md). The general rules hold for any matmul-dominated architecture, and this repository grows model- and workload-specific studies over time.
 
