@@ -1,0 +1,102 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+site_name: TPU Model Co-Design Guide
+site_description: Practical, hardware-grounded architectural design and systems optimization principles for LLMs and MoEs on Google Cloud TPUs.
+site_author: Gagik Amirkhanyan and Vaibhav Singh
+site_url: https://ai-hypercomputer.github.io/tpu-codesign/
+
+repo_name: AI-Hypercomputer/tpu-codesign
+repo_url: https://github.com/AI-Hypercomputer/tpu-codesign
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: Roboto Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.view
+    - toc.follow
+
+plugins:
+  - search
+  - blog:
+      blog_dir: blog
+      blog_toc: true
+      post_date_format: long
+      authors: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0.16.11/dist/katex.min.js
+  - https://unpkg.com/katex@0.16.11/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0.16.11/dist/katex.min.css
+  - stylesheets/extra.css
+
+nav:
+  - Guide:
+      - Overview & Hardware Facts: index.md
+      - "Part I: Shape Rules (1-3)": shape-rules.md
+      - "Part II: Architecture Choices (4-9)": architecture-choices.md
+      - "Part III: Systems Mapping (10-13)": systems-mapping.md
+      - "Part IV: Blueprint & Diagnostics": blueprint-and-diagnostics.md
+      - "Appendix A: Design & Evaluation": appendix-a.md
+      - "Appendix B: Inference Co-Design": appendix-b.md
+  - All-in-One:
+      - Complete Guide (Single Page): guide.md
+  - Blog & Studies:
+      - blog/index.md
