@@ -45,7 +45,7 @@ Without gradient accumulation, DP and FSDP move comparable bytes over DCN and bo
 
 ---
 
-## 3. Static shapes everywhere (including dropless MoE routing)
+## 3. Static and Dynamic Shapes
 
 XLA compiles each program for exact input tensor shapes and dtypes, so every buffer has a fixed address and every loop a known trip count; introducing a new shape at runtime triggers recompilation and a host stall. Dynamic workloads still fit this execution model cleanly: the key is to **separate the compile-time shape of a buffer from the runtime extent of the data inside it**.
 
