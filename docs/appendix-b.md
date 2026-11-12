@@ -47,7 +47,7 @@ Evaluate model architecture and serving configuration jointly at your target pro
 * JAX ML, [*How to Scale Your Model*](https://jax-ml.github.io/scaling-book/) (`jax-ml/scaling-book`)
 * AI-Hypercomputer, [*tpu-recipes*](https://github.com/AI-Hypercomputer/tpu-recipes) (Ironwood training and inference recipes)
 * AI-Hypercomputer, [*MaxText*](https://github.com/AI-Hypercomputer/maxtext) (open-source reference JAX/TPU LLM and MoE implementation)
-* Google DeepMind, [*Tokamax*](https://github.com/google-deepmind/tokamax) (open-source JAX/Pallas custom kernel library for TPUs and GPUs)
+* Google DeepMind, [*Tokamax*](https://github.com/openxla/tokamax) (open-source JAX/Pallas custom kernel library for TPUs and GPUs)
 * [*TPU Ragged Paged Attention*](https://arxiv.org/abs/2604.15464) (arXiv:2604.15464)
 
 ### Frontier model architecture reports
