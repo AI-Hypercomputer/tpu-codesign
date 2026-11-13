@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+.md-grid {
+  max-width: 72rem;
+}
+
 .md-typeset {
   font-size: 0.82rem;
   line-height: 1.65;
@@ -45,6 +49,12 @@
 .md-typeset table:not([class]) th {
   font-weight: 600;
   background-color: var(--md-code-bg-color);
+  min-width: 0;
+}
+
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.7em 0.9em;
 }
 
 .md-typeset img {
