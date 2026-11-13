@@ -14,12 +14,12 @@
 
 site_name: TPU Model Co-Design Guide
 site_description: Practical, hardware-grounded architectural design and systems optimization principles for LLMs and MoEs on Google Cloud TPUs.
-site_author: Gagik Amirkhanyan and Vaibhav Singh
+site_author: TPU Co-Design Authors
 site_url: https://ai-hypercomputer.github.io/tpu-codesign/
 
 repo_name: AI-Hypercomputer/tpu-codesign
 repo_url: https://github.com/AI-Hypercomputer/tpu-codesign
-edit_uri: edit/main/docs/
+edit_uri: blob/main/docs/
 
 theme:
   name: material
@@ -50,7 +50,7 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
-    - content.action.view
+    - content.action.edit
     - toc.follow
 
 plugins:

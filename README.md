@@ -32,9 +32,9 @@ mkdocs serve
 ## Citation
 
 ```bibtex
-@misc{amirkhanyan2026tpucodesign,
+@misc{tpucodesign2026,
   title  = {TPU Model Design Considerations and Optimization Guide},
-  author = {Amirkhanyan, Gagik and Singh, Vaibhav},
+  author = {{TPU Co-Design Authors}},
   year   = {2026},
   howpublished = {\url{https://ai-hypercomputer.github.io/tpu-codesign/}},
   note   = {Google Cloud AI Hypercomputer}
