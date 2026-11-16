@@ -12,6 +12,8 @@ Strictly, systolic tile alignment binds a matmul's contracting (reduction) and o
 
 The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality.
 
+![MXU 256x256 tile fill comparison for head_dim = 128 versus head_dim = 256 at matched parameters, FLOPs, and KV bytes](assets/images/p1-head-dim-tile-fill.png)
+
 **Measured:** Reshaping Qwen3-30B MoE attention from 32 heads × 128 to 16 heads × 256 (identical parameters and FLOPs) accelerated end-to-end training on Ironwood, with the speedup widening at longer sequence lengths as quadratic attention takes a larger share of step time:
 
 ![Measured training MFU gain from reshaping head_dim from 128 to 256 across 8K, 16K, and 32K context](assets/images/p1-head-dim-256-mfu.png)

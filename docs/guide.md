@@ -48,6 +48,8 @@ Performance tuning starts with model definition. Architectural choices made befo
 
 TPUs are custom ML ASICs engineered for performance per TCO, trading general-purpose hardware scheduling for wide 256×256 systolic arrays, software-managed VMEM, dedicated SparseCore engines, and direct multi-dimensional ICI fabrics. Reaching peak efficiency means aligning model shapes, routing, and parallelism with those hardware choices:
 
+![Ironwood (TPU v7x) dual-chiplet package, on-chip memory hierarchy, 3D ICI torus, and pod-to-pod DCN](assets/images/overview-ironwood-architecture.png)
+
 | Property | Value | Design consequence |
 | :--- | :--- | :--- |
 | **MXU (matrix multiply unit)** | 256×256 systolic array | Make every per-device contracting and output dimension a multiple of 256: matmuls execute in 256-wide tiles, and unaligned remainders are zero-padded, wasting cycles. |
@@ -76,6 +78,8 @@ Make `d_model`, FFN and expert intermediate dimensions (`d_ff`), latent widths (
 Strictly, systolic tile alignment binds a matmul's contracting (reduction) and output dimensions; token and batch axes stream freely through the array, and counts such as query/KV heads, layers, and experts are exempt so long as the underlying head and hidden widths are aligned. Because every model width listed above acts as a contracting or output axis in at least one forward or backward GEMM, aligning all of them to 256 avoids wasted cycles across the entire step.
 
 The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality.
+
+![MXU 256x256 tile fill comparison for head_dim = 128 versus head_dim = 256 at matched parameters, FLOPs, and KV bytes](assets/images/p1-head-dim-tile-fill.png)
 
 **Measured:** Reshaping Qwen3-30B MoE attention from 32 heads × 128 to 16 heads × 256 (identical parameters and FLOPs) accelerated end-to-end training on Ironwood, with the speedup widening at longer sequence lengths as quadratic attention takes a larger share of step time:
 
@@ -138,6 +142,8 @@ Structural and numerical choices reshape an architecture's compute-to-memory and
 Standard expert parallelism (EP) dispatches every routed token across chips at full `d_model` width. In Ironwood benchmarks on uncompressed MoEs, that cross-chip traffic was heavy enough that plain FSDP outperformed EP + FSDP.
 
 The structural fix is **LatentMoE**: project each token from `d_model` ($d$) down to a narrower latent width `ℓ` before dispatch, execute the routed experts entirely in `ℓ`-dimensional latent space, and project back up to `d_model` after combine. Every cross-chip collective and on-device token permute then moves `ℓ`-wide vectors rather than `d_model`-wide vectors. First introduced by [Nemotron 3](https://arxiv.org/abs/2512.20856), LatentMoE has been adopted at frontier scale by Microsoft's 962B [MAI-Base-1](https://microsoft.ai/pdf/mai-thinking-1.pdf) (34.7B active) and Moonshot AI's 2.8T [Kimi K3](https://arxiv.org/abs/2607.24653) ("Stable LatentMoE", 16-of-896 routed experts).
+
+![Standard MoE versus LatentMoE with parallel shared expert, narrow latent dispatch and combine, and wider expert FFN](assets/images/p4-latentmoe-architecture.png)
 
 **Quantified design rules:**
 
@@ -219,6 +225,8 @@ A lightweight drafter proposes candidate future tokens and the target model veri
 **Multi-Token Prediction (MTP) heads are the cleanest design-time option:** Jointly trained MTP heads provide both a denser pretraining supervision signal and a built-in drafter without deploying a separate draft model. [DeepSeek-V3](https://arxiv.org/html/2412.19437v2#S5.SS4.SSS3) reports 85–90% acceptance on the first drafted token; [Qwen3-Next](https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Thinking) and [GLM-4.5](https://arxiv.org/html/2508.06471v1#S2) likewise include native MTP heads; and [Nemotron 3](https://research.nvidia.com/labs/nemotron/files/NVIDIA-Nemotron-3-White-Paper.pdf#page=5) reports ~2.4% average relative benchmark gains alongside ~97% acceptance across the first two drafted tokens in an 8B-active MoE ablation. Keep MTP heads in BF16.
 
 **Measure net committed tokens/s and size to real concurrency:** Account for drafting, verification, and KV rollback overhead across the full cycle at target concurrency (gains taper naturally once batch concurrency makes decode compute-bound). Per-token decode latency is bounded below by `per-chip weight bytes ÷ HBM bandwidth` (for example, when the batch touches all experts, Qwen3.5-397B in FP8 across 4 Ironwood chips streams ~100 GB/chip, setting a ~13.5 ms weight-read floor before KV), while max batch is capped by `(remaining HBM) ÷ (allocated KV/state per sequence)`. For MoEs, weight traffic scales with the **union of experts touched across the batch** ($E \cdot [1 - (1 - K/E)^B]$ under uniform routing); profile busiest-rank skew and replicate hot experts ([DeepSeek-V3](https://arxiv.org/pdf/2412.19437)) when HBM permits. If real concurrency will be small, design fewer active bytes rather than planning around a batch size you will not have ([Appendix A.4](#a4-size-the-model-to-your-real-serving-concurrency), [Appendix B](#appendix-b-inference-hardware-software-co-design-and-references)).
+
+![Ironwood FP8 decode roofline showing MTP speculative decoding and routed expert occupancy across decode batch size](assets/images/p8-decode-roofline-occupancy.png)
 
 ---
 

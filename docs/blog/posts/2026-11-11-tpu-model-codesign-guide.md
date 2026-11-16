@@ -13,6 +13,8 @@ Google designed TPUs from the ground up for machine learning efficiency across b
 
 <!-- more -->
 
+![Ironwood (TPU v7x) dual-chiplet package, on-chip memory hierarchy, 3D ICI torus, and pod-to-pod DCN](../../assets/images/overview-ironwood-architecture.png)
+
 ## What the guide covers
 
 The guide organizes 13 concrete, hardware-grounded design and systems rules into three groups based on engineering stage and model-quality risk:

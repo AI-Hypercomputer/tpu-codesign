@@ -44,6 +44,8 @@ Performance tuning starts with model definition. Architectural choices made befo
 
 TPUs are custom ML ASICs engineered for performance per TCO, trading general-purpose hardware scheduling for wide 256×256 systolic arrays, software-managed VMEM, dedicated SparseCore engines, and direct multi-dimensional ICI fabrics. Reaching peak efficiency means aligning model shapes, routing, and parallelism with those hardware choices:
 
+![Ironwood (TPU v7x) dual-chiplet package, on-chip memory hierarchy, 3D ICI torus, and pod-to-pod DCN](assets/images/overview-ironwood-architecture.png)
+
 | Property | Value | Design consequence |
 | :--- | :--- | :--- |
 | **MXU (matrix multiply unit)** | 256×256 systolic array | Make every per-device contracting and output dimension a multiple of 256: matmuls execute in 256-wide tiles, and unaligned remainders are zero-padded, wasting cycles. |
