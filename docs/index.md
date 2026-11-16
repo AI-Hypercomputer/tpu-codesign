@@ -1,6 +1,6 @@
 # TPU Model Design Considerations and Optimization Guide
 
-**Authors:** Gagik Amirkhanyan and Vaibhav Singh (Google Cloud)
+**Authors:** TPU Co-Design Authors (Google Cloud)
 
 ## Purpose
 

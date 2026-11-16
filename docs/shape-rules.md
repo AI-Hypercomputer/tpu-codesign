@@ -18,12 +18,6 @@ The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `
 
 ![Measured training MFU gain from reshaping head_dim from 128 to 256 across 8K, 16K, and 32K context](assets/images/p1-head-dim-256-mfu.png)
 
-| Context length | `head_dim = 128` | `head_dim = 256` | End-to-end MFU gain |
-| :--- | ---: | ---: | ---: |
-| 8K | 23.1% MFU | **28.1% MFU** | +21% |
-| 16K | 23.3% MFU | **30.8% MFU** | +32% |
-| 32K | 23.7% MFU | **34.7% MFU** | **+46%** |
-
 MXU-aligned grouped-matmul tiles added a further ~+15% speedup on the MoE expert GEMMs.
 
 **Non-quadratic and linear attention:** These alignment rules apply to chunkwise linear and recurrent attention kernels as well. Notably, Gated DeltaNet ablations in [Yang et al. (2025)](https://arxiv.org/abs/2412.06464) report on-par or better model quality at `head_dim = 256` while matching wide systolic tiles.

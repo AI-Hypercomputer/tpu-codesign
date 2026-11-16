@@ -5,7 +5,7 @@ search:
 
 # TPU Model Design Considerations and Optimization Guide
 
-**Authors:** Gagik Amirkhanyan and Vaibhav Singh (Google Cloud)
+**Authors:** TPU Co-Design Authors (Google Cloud)
 
 ## Purpose
 
@@ -84,12 +84,6 @@ The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `
 **Measured:** Reshaping Qwen3-30B MoE attention from 32 heads × 128 to 16 heads × 256 (identical parameters and FLOPs) accelerated end-to-end training on Ironwood, with the speedup widening at longer sequence lengths as quadratic attention takes a larger share of step time:
 
 ![Measured training MFU gain from reshaping head_dim from 128 to 256 across 8K, 16K, and 32K context](assets/images/p1-head-dim-256-mfu.png)
-
-| Context length | `head_dim = 128` | `head_dim = 256` | End-to-end MFU gain |
-| :--- | ---: | ---: | ---: |
-| 8K | 23.1% MFU | **28.1% MFU** | +21% |
-| 16K | 23.3% MFU | **30.8% MFU** | +32% |
-| 32K | 23.7% MFU | **34.7% MFU** | **+46%** |
 
 MXU-aligned grouped-matmul tiles added a further ~+15% speedup on the MoE expert GEMMs.
 
