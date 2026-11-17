@@ -1,6 +1,6 @@
 # Part I: Shape Rules (Adopt Always)
 
-Shape rules align model tensor dimensions, batch divisibility, and runtime execution shapes with the TPU compiler and MXU datapath. They carry near-zero model-quality risk and belong in every new model definition before the first training run.
+Shape rules align model tensor dimensions, batch divisibility, and runtime execution shapes with the TPU compiler and MXU datapath. They carry low to near-zero model-quality risk and belong in every new model definition before the first training run.
 
 ---
 
@@ -10,7 +10,7 @@ Make `d_model`, FFN and expert intermediate dimensions (`d_ff`), latent widths (
 
 Strictly, systolic tile alignment binds a matmul's contracting (reduction) and output dimensions; token and batch axes stream freely through the array, and counts such as query/KV heads, layers, and experts are exempt so long as the underlying head and hidden widths are aligned. Because every model width listed above acts as a contracting or output axis in at least one forward or backward GEMM, aligning all of them to 256 avoids wasted cycles across the entire step.
 
-The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality.
+The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality on large models, which still have enough Q and KV heads after halving. On smaller models, halving head count can leave too few heads or limit decode TP sharding, so run a quick ablation first.
 
 ![MXU 256x256 tile fill comparison for head_dim = 128 versus head_dim = 256 at matched parameters, FLOPs, and KV bytes](assets/images/p1-head-dim-tile-fill.png)
 

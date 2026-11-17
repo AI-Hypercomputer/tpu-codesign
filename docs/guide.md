@@ -17,7 +17,7 @@ Prefer multi-chapter navigation? Browse the [online book and blog](https://ai-hy
 
 Performance tuning starts with model definition. Architectural choices made before the first training step set permanent ceilings on Model FLOP Utilization (MFU), training cost, and serving latency. This guide provides concrete, hardware-grounded design rules for teams building or adapting models for TPUs, organized into three groups by engineering stage and quality risk:
 
-1. **[Shape rules](#part-i-shape-rules-adopt-always) (Principles 1–3):** Hardware-aligned dimensions, single-plan parallelism, and static shapes with dynamic runtime extent; near-zero model-quality risk. *Adopt always.*
+1. **[Shape rules](#part-i-shape-rules-adopt-always) (Principles 1–3):** Hardware-aligned dimensions, single-plan parallelism, and static shapes with dynamic runtime extent; low to near-zero model-quality risk. *Adopt always.*
 2. **[Architecture choices](#part-ii-architecture-choices-validate-with-ablations) (Principles 4–9):** Structural and numerical design choices; most involve quality trade-offs. *Validate with ablations.*
 3. **[Expressing parallelism & systems mapping](#part-iii-expressing-parallelism-systems-mapping-no-model-changes-required) (Principles 10–13):** Parallelism placement across physical links, memory pipelining, serving disaggregation, and compiler tuning; no model architecture changes required.
 
@@ -27,7 +27,7 @@ Performance tuning starts with model definition. Architectural choices made befo
 
 | # | Group | Guideline summary | Scope | Targets | Quality risk |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [1](#1-align-every-per-device-reduction-and-output-dimension-to-256) | Shape | Make every per-device model reduction and output dimension a multiple of 256 (most frequently missed: `head_dim = 256`); counts such as `num_heads`, `layers`, and `batch` are exempt. | General | Both | ~None |
+| [1](#1-align-every-per-device-reduction-and-output-dimension-to-256) | Shape | Make every per-device model reduction and output dimension a multiple of 256 (most frequently missed: `head_dim = 256`); counts such as `num_heads`, `layers`, and `batch` are exempt. | General | Both | Low (~None for large models) |
 | [2](#2-plan-one-parallelism-strategy-from-4-chips-to-multi-pod) | Shape | Plan dimensions for a large TPU scale-up domain (FSDP/TP/EP over ICI) paired with multi-slice scaling (DP/FSDP/PP over DCN, never EP or TP). | General | Training | ~None |
 | [3](#3-static-and-dynamic-shapes) | Shape | Separate compile-time buffer shape from runtime data extent via bucketing, masking, and `SMEM` scalar prefetch (`PrefetchScalarGridSpec`) so dropless MoE (`Megablox`, Tokamax GMM) and paged attention run without recompilation or padding waste. | General + MoE | Both | ~None |
 | [4](#4-compress-routed-token-traffic-with-latentmoe) | Arch | Compress routed token communication volumes with **LatentMoE** (reinvesting saved bandwidth into expert capacity) and low-precision (FP8) all-to-all dispatch. | MoE | Both | Ablate (LatentMoE); FP8 A2A is quality-neutral |
@@ -67,7 +67,7 @@ TPUs are custom ML ASICs engineered for performance per TCO, trading general-pur
 
 ## Part I: Shape Rules (Adopt Always)
 
-Shape rules align model tensor dimensions, batch divisibility, and runtime execution shapes with the TPU compiler and MXU datapath. They carry near-zero model-quality risk and belong in every new model definition before the first training run.
+Shape rules align model tensor dimensions, batch divisibility, and runtime execution shapes with the TPU compiler and MXU datapath. They carry low to near-zero model-quality risk and belong in every new model definition before the first training run.
 
 ---
 
@@ -77,7 +77,7 @@ Make `d_model`, FFN and expert intermediate dimensions (`d_ff`), latent widths (
 
 Strictly, systolic tile alignment binds a matmul's contracting (reduction) and output dimensions; token and batch axes stream freely through the array, and counts such as query/KV heads, layers, and experts are exempt so long as the underlying head and hidden widths are aligned. Because every model width listed above acts as a contracting or output axis in at least one forward or backward GEMM, aligning all of them to 256 avoids wasted cycles across the entire step.
 
-The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality.
+The most frequently missed dimension is **`head_dim`**: at `head_dim = 128` or `64`, the $QK^\top$ and $PV$ products in FlashAttention leave the MXU ≥ 50% idle. Reshape to **`head_dim = 256`** with proportionally fewer Q and KV heads, preserving total projection widths, parameter count, FLOPs, and logical KV cache bytes. Coordinated-reshape ablations confirm iso-quality on large models, which still have enough Q and KV heads after halving. On smaller models, halving head count can leave too few heads or limit decode TP sharding, so run a quick ablation first.
 
 ![MXU 256x256 tile fill comparison for head_dim = 128 versus head_dim = 256 at matched parameters, FLOPs, and KV bytes](assets/images/p1-head-dim-tile-fill.png)
 

@@ -12,7 +12,7 @@ Prefer reading on one page? Open the [Complete Guide (Single Page)](guide.md).
 
 Performance tuning starts with model definition. Architectural choices made before the first training step set permanent ceilings on Model FLOP Utilization (MFU), training cost, and serving latency. This guide provides concrete, hardware-grounded design rules for teams building or adapting models for TPUs, organized into three groups by engineering stage and quality risk:
 
-1. **[Shape rules](shape-rules.md) (Principles 1–3):** Hardware-aligned dimensions, single-plan parallelism, and static shapes with dynamic runtime extent; near-zero model-quality risk. *Adopt always.*
+1. **[Shape rules](shape-rules.md) (Principles 1–3):** Hardware-aligned dimensions, single-plan parallelism, and static shapes with dynamic runtime extent; low to near-zero model-quality risk. *Adopt always.*
 2. **[Architecture choices](architecture-choices.md) (Principles 4–9):** Structural and numerical design choices; most involve quality trade-offs. *Validate with ablations.*
 3. **[Expressing parallelism & systems mapping](systems-mapping.md) (Principles 10–13):** Parallelism placement across physical links, memory pipelining, serving disaggregation, and compiler tuning; no model architecture changes required.
 
@@ -22,7 +22,7 @@ Performance tuning starts with model definition. Architectural choices made befo
 
 | # | Group | Guideline summary | Scope | Targets | Quality risk |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [1](shape-rules.md#1-align-every-per-device-reduction-and-output-dimension-to-256) | Shape | Make every per-device model reduction and output dimension a multiple of 256 (most frequently missed: `head_dim = 256`); counts such as `num_heads`, `layers`, and `batch` are exempt. | General | Both | ~None |
+| [1](shape-rules.md#1-align-every-per-device-reduction-and-output-dimension-to-256) | Shape | Make every per-device model reduction and output dimension a multiple of 256 (most frequently missed: `head_dim = 256`); counts such as `num_heads`, `layers`, and `batch` are exempt. | General | Both | Low (~None for large models) |
 | [2](shape-rules.md#2-plan-one-parallelism-strategy-from-4-chips-to-multi-pod) | Shape | Plan dimensions for a large TPU scale-up domain (FSDP/TP/EP over ICI) paired with multi-slice scaling (DP/FSDP/PP over DCN, never EP or TP). | General | Training | ~None |
 | [3](shape-rules.md#3-static-and-dynamic-shapes) | Shape | Separate compile-time buffer shape from runtime data extent via bucketing, masking, and `SMEM` scalar prefetch (`PrefetchScalarGridSpec`) so dropless MoE (`Megablox`, Tokamax GMM) and paged attention run without recompilation or padding waste. | General + MoE | Both | ~None |
 | [4](architecture-choices.md#4-compress-routed-token-traffic-with-latentmoe) | Arch | Compress routed token communication volumes with **LatentMoE** (reinvesting saved bandwidth into expert capacity) and low-precision (FP8) all-to-all dispatch. | MoE | Both | Ablate (LatentMoE); FP8 A2A is quality-neutral |
