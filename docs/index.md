@@ -57,4 +57,6 @@ TPUs are custom ML ASICs engineered for performance per TCO, trading general-pur
 | **Topology** | 3D torus (ICI) + DCN (data-center network) across pods | EP and CP require torus bandwidth every layer; DP and PP tolerate DCN best (one fixed-size sync per step or stage). FSDP over DCN re-gathers sharded weights on every accumulation microbatch, so reserve it for models exceeding one slice's HBM. |
 | **SparseCore** | Dedicated offload engines for irregular memory access and collectives | Embedding lookups, MoE dispatch (`sort`, `gather`, `scatter`), and async collectives can execute off the TensorCore, overlapped with MXU compute. |
 
+**Building for Trillium (TPU v6e)?** The shape rules apply unchanged. See [Trillium (TPU v6e) Notes](trillium-v6e.md) for the hardware differences and what changes.
+
 *Parallelism shorthand used throughout:* DP = data, TP = tensor, EP = expert, CP = context, PP = pipeline parallelism; FSDP = fully sharded data parallel.

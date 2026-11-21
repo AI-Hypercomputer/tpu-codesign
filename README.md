@@ -18,6 +18,7 @@ Google designed TPUs from the ground up for machine learning efficiency and perf
 | **[Part IV: Blueprint & Diagnostics](docs/blueprint-and-diagnostics.md)** | Regime prioritization, 6-signal XProf triage checklist, kernel roofline & HBM budgeting rules, and a complete **~100B Ironwood LatentMoE reference config** | n/a |
 | **[Appendix A: Design & Evaluation (`A.1–A.8`)](docs/appendix-a.md)** | Aspect-ratio ladders, single-knob (`L`) family scaling, HBM remat vs. offload, serving concurrency sizing, distilled tiers, wall-clock ablations, serving PTQ, and published Ironwood reference targets | n/a |
 | **[Appendix B: Inference Co-Design & References](docs/appendix-b.md)** | End-to-end serving co-design checklist, KV & MoE batch-occupancy budget equations, and primary references | n/a |
+| **[Trillium (TPU v6e) Notes](docs/trillium-v6e.md)** | Side-by-side Trillium and Ironwood hardware table, which principles carry over, which change, and a memory-first checklist for 32 GB devices | n/a |
 | **[Complete Guide (Single Page)](docs/guide.md)** | All chapters, figures, and appendices combined in one self-contained Markdown document | n/a |
 
 ## Previewing the Site Locally

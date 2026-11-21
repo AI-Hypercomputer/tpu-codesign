@@ -96,6 +96,7 @@ nav:
       - "Part IV: Blueprint & Diagnostics": blueprint-and-diagnostics.md
       - "Appendix A: Design & Evaluation": appendix-a.md
       - "Appendix B: Inference Co-Design": appendix-b.md
+      - "Trillium (TPU v6e) Notes": trillium-v6e.md
   - All-in-One:
       - Complete Guide (Single Page): guide.md
   - Blog & Studies:

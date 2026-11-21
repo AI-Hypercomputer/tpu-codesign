@@ -10,7 +10,7 @@ The rule that holds 99% of the time: **assign every logical parallelism axis to 
 
 Within that link hierarchy:
 
-* **TP = 2 maximum for training (mapped to D2D), wider TP for decode:** On Ironwood, TP = 2 stays on the ~6× faster intra-package die-to-die (D2D) link between the two TensorCore chiplets. Extending TP to 4 across 1D ICI requires an MLP intermediate width above ~46K to clear the ~11,500 BF16 (~23,000 FP8) FLOPs/byte ICI threshold, which virtually no model reaches. **Serving decode is different:** decode is HBM-bandwidth-bound, so wider TP shards weight *reads* rather than hiding compute (for example, Ironwood vLLM recipes serve Qwen3-Coder-480B-A35B with TP = 8 plus EP).
+* **TP = 2 maximum for training (mapped to D2D), wider TP for decode:** On Ironwood, TP = 2 stays on the ~6× faster intra-package die-to-die (D2D) link between the two TensorCore chiplets. Chips with one TensorCore, such as Trillium (TPU v6e), have no D2D link, so any TP crosses ICI: start from TP = 1 there. Extending TP to 4 across 1D ICI requires an MLP intermediate width above ~46K to clear the ~11,500 BF16 (~23,000 FP8) FLOPs/byte ICI threshold, which virtually no model reaches. **Serving decode is different:** decode is HBM-bandwidth-bound, so wider TP shards weight *reads* rather than hiding compute (for example, Ironwood vLLM recipes serve Qwen3-Coder-480B-A35B with TP = 8 plus EP).
 
 ![Training TP = 2 on intra-chip D2D vs. wider serving decode TP across ICI](assets/images/p10-d2d-vs-ici-tp.png)
 
