@@ -1,6 +1,6 @@
 # Part III: Expressing Parallelism & Systems Mapping (No Model Changes Required)
 
-Expressing parallelism and tuning the runtime stack apply equally when training a new architecture from scratch or adapting an existing open-weight checkpoint without modifying weights or numerics.
+Expressing parallelism and tuning the runtime stack apply equally when training a new architecture from scratch or adapting an existing open-weight checkpoint without changing its architecture or weights. Two options here do change numerics, the FP8 KV cache (Principle 12) and multi-pass BF16 (Principle 13): validate quality when you enable them.
 
 ---
 
